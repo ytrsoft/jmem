@@ -1,6 +1,6 @@
 package com.ytrsoft;
 
-public class App {
+public class MainClass {
     public static void main(String[] args) {
         System.out.println("JMem");
     }
