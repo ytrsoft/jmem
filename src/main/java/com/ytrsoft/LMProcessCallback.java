@@ -1,4 +1,4 @@
-package com.ytrsoft.core;
+package com.ytrsoft;
 
 import com.sun.jna.win32.StdCallLibrary;
 

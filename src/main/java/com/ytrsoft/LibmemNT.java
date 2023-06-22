@@ -1,4 +1,4 @@
-package com.ytrsoft.core;
+package com.ytrsoft;
 
 public interface LibmemNT {
     int INST_SIZE = 16;
