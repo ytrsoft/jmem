@@ -3,7 +3,7 @@ package com.ytrsoft;
 public class LmProcess {
     private int id;
     private int pid;
-    private int arch;
+    private Architecture arch;
     private long bits;
     private long startTime;
     private String path;
@@ -14,7 +14,7 @@ public class LmProcess {
     public LmProcess(Libmem.LmProcess p) {
         this.id = p.pid;
         this.pid = p.ppid;
-        this.arch = p.arch;
+        this.arch = Architecture.fromValue(p.arch);
         this.bits = p.bits;
         this.startTime = p.start_time;
         this.name = NativeString.load(p.name);
@@ -25,7 +25,7 @@ public class LmProcess {
         Libmem.LmProcess p = new Libmem.LmProcess();
         p.pid = this.id;
         p.ppid = this.pid;
-        p.arch = this.arch;
+        p.arch = this.arch.getValue();
         p.bits = this.bits;
         p.start_time = this.startTime;
         p.name = NativeString.toByteArray(this.name, Libmem.LM_PATH_MAX);
@@ -49,11 +49,11 @@ public class LmProcess {
         this.pid = pid;
     }
 
-    public int getArch() {
+    public Architecture getArch() {
         return arch;
     }
 
-    public void setArch(int arch) {
+    public void setArch(Architecture arch) {
         this.arch = arch;
     }
 

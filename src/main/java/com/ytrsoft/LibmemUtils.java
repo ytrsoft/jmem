@@ -10,10 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * LibmemUtils 工具类
- * 提供与 Libmem 库交互的实用方法
- * 包括内存操作、进程线程管理、模块处理、汇编和反汇编操作
- * 该类为 final 类 不可实例化
+ * Libmem 工具类
  */
 public final class LibmemUtils {
 
@@ -21,11 +18,8 @@ public final class LibmemUtils {
         throw new UnsupportedOperationException();
     }
 
-    // 进程信息操作
-
     /**
      * 获取当前进程的位数
-     *
      * @return 位数 (32 或 64)
      */
     public static int getBits() {
@@ -46,8 +40,9 @@ public final class LibmemUtils {
      *
      * @return 架构标识
      */
-    public static int getArchitecture() {
-        return Libmem.INSTANCE.LM_GetArchitecture();
+    public static Architecture getArchitecture() {
+        int arch = Libmem.INSTANCE.LM_GetArchitecture();
+        return Architecture.fromValue(arch);
     }
 
     /**
@@ -109,8 +104,6 @@ public final class LibmemUtils {
     public static boolean isProcessAlive(LmProcess process) {
         return Libmem.INSTANCE.LM_IsProcessAlive(process.toRef());
     }
-
-    // 线程信息操作
 
     /**
      * 获取所有正在运行的线程列表
@@ -177,8 +170,6 @@ public final class LibmemUtils {
         boolean success = Libmem.INSTANCE.LM_GetThread(nativeThread);
         return success ? new LmThread(nativeThread) : new LmThread();
     }
-
-    // 模块信息操作
 
     /**
      * 获取当前进程中加载的所有模块
@@ -282,24 +273,16 @@ public final class LibmemUtils {
         return Libmem.INSTANCE.LM_UnloadModuleEx(process.toRef(), module.toRef());
     }
 
-    // 内存操作
-
     /**
      * 读取指定地址的内存
      *
      * @param address 内存地址
      * @param size 要读取的字节数
-     * @return 包含读取数据的字节数组
+     * @return 包含读取地址的值
      */
-    public static byte[] readMemory(long address, long size) {
+    public static long readMemory(long address, long size) {
         Memory buffer = new Memory(size);
-        long bytesRead = Libmem.INSTANCE.LM_ReadMemory(address, buffer, size);
-        if (bytesRead == size) {
-            byte[] data = new byte[(int) size];
-            buffer.read(0, data, 0, (int) size);
-            return data;
-        }
-        return null;
+        return Libmem.INSTANCE.LM_ReadMemory(address, buffer, size);
     }
 
     /**
@@ -318,7 +301,7 @@ public final class LibmemUtils {
             buffer.read(0, data, 0, (int) size);
             return data;
         }
-        return null;
+        return new byte[] {};
     }
 
     /**
@@ -349,8 +332,6 @@ public final class LibmemUtils {
         long bytesWritten = Libmem.INSTANCE.LM_WriteMemoryEx(process.toRef(), address, buffer, data.length);
         return bytesWritten == data.length;
     }
-
-    // 内存保护 分配和扫描操作
 
     /**
      * 修改指定内存地址的保护属性
@@ -448,8 +429,6 @@ public final class LibmemUtils {
         return Libmem.INSTANCE.LM_DeepPointer(base, offsets, offsets.length);
     }
 
-    // 内存段操作
-
     /**
      * 获取所有的内存段信息
      *
@@ -505,8 +484,6 @@ public final class LibmemUtils {
         boolean success = Libmem.INSTANCE.LM_FindSegmentEx(process.toRef(), address, nativeSegment);
         return success ? new LmSegment(nativeSegment) : new LmSegment();
     }
-
-    // 符号操作
 
     /**
      * 获取模块中的所有解码符号
@@ -592,8 +569,6 @@ public final class LibmemUtils {
         Libmem.INSTANCE.LM_FreeDemangledSymbol(symbolName);
     }
 
-    // 汇编和反汇编操作
-
     /**
      * 执行反汇编操作
      *
@@ -640,8 +615,6 @@ public final class LibmemUtils {
         Libmem.INSTANCE.LM_FreeInstructions(instructions);
     }
 
-    // 钩子操作
-
     /**
      * 为指定代码地址安装钩子
      *
@@ -679,8 +652,6 @@ public final class LibmemUtils {
     public static boolean unhookCode(LmProcess process, long from, long trampoline, long size) {
         return Libmem.INSTANCE.LM_UnhookCodeEx(process.toRef(), from, trampoline, size);
     }
-
-    // 内存扫描相关操作
 
     /**
      * 进行模式扫描 根据指定模式在内存中搜索数据
@@ -794,8 +765,6 @@ public final class LibmemUtils {
         return Libmem.INSTANCE.LM_SetMemory(address, value, size);
     }
 
-    // 汇编代码操作
-
     /**
      * 将汇编代码转为机器代码
      *
@@ -828,8 +797,6 @@ public final class LibmemUtils {
     public static void freePayload(Pointer payload) {
         Libmem.INSTANCE.LM_FreePayload(payload);
     }
-
-    // 虚方法表 (VMT) 操作
 
     /**
      * 创建新的虚方法表
