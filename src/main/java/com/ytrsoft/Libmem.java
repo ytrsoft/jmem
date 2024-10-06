@@ -28,12 +28,6 @@ public interface Libmem extends StdCallLibrary {
         public byte[] name = new byte[LM_PATH_MAX];
 
         public static class ByReference extends LmProcess implements Structure.ByReference {}
-
-        @Override
-        public String toString() {
-            return String.format("LmProcess{pid=%d, ppid=%d, arch=%d, bits=%d, start_time=%d, path=%s, name=%s}",
-                    pid, ppid, arch, bits, start_time, Native.toString(path).trim(), Native.toString(name).trim());
-        }
     }
 
     @Structure.FieldOrder({"tid", "owner_pid"})

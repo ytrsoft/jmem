@@ -34,4 +34,12 @@ public class LmThread {
     public void setPid(int pid) {
         this.pid = pid;
     }
+
+    @Override
+    public String toString() {
+        return "LmThread{" +
+                "id=" + id +
+                ", pid=" + pid +
+                '}';
+    }
 }

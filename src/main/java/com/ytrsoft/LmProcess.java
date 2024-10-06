@@ -88,4 +88,17 @@ public class LmProcess {
     public void setName(String name) {
         this.name = name;
     }
+
+    @Override
+    public String toString() {
+        return "LmProcess{" +
+                "id=" + id +
+                ", pid=" + pid +
+                ", arch=" + arch +
+                ", bits=" + bits +
+                ", startTime=" + startTime +
+                ", path='" + path + '\'' +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

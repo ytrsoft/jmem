@@ -1,5 +1,7 @@
 package com.ytrsoft;
 
+import java.util.Arrays;
+
 public class LmInst {
     private long address;
     private int size;
@@ -64,5 +66,16 @@ public class LmInst {
 
     public void setOpStr(String opStr) {
         this.opStr = opStr;
+    }
+
+    @Override
+    public String toString() {
+        return "LmInst{" +
+                "address=" + address +
+                ", size=" + size +
+                ", bytes=" + Arrays.toString(bytes) +
+                ", mnemonic='" + mnemonic + '\'' +
+                ", opStr='" + opStr + '\'' +
+                '}';
     }
 }

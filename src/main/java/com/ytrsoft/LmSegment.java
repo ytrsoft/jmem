@@ -55,4 +55,14 @@ public class LmSegment {
     public void setProt(int prot) {
         this.prot = prot;
     }
+
+    @Override
+    public String toString() {
+        return "LmSegment{" +
+                "base=" + base +
+                ", end=" + end +
+                ", size=" + size +
+                ", prot=" + prot +
+                '}';
+    }
 }

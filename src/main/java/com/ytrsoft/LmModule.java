@@ -66,4 +66,15 @@ public class LmModule {
     public void setName(String name) {
         this.name = name;
     }
+
+    @Override
+    public String toString() {
+        return "LmModule{" +
+                "base=" + base +
+                ", end=" + end +
+                ", size=" + size +
+                ", path='" + path + '\'' +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }
