@@ -21,7 +21,7 @@ public class LmProcess {
         this.path = NativeString.load(p.path);
     }
 
-    public Libmem.LmProcess toStructure() {
+    public Libmem.LmProcess toRef() {
         Libmem.LmProcess p = new Libmem.LmProcess();
         p.pid = this.id;
         p.ppid = this.pid;
