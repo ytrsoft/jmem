@@ -1,135 +1,344 @@
 package com.ytrsoft;
 
-import com.sun.jna.Native;
-import com.sun.jna.ptr.IntByReference;
-import com.sun.jna.ptr.PointerByReference;
+import com.sun.jna.*;
+import com.sun.jna.ptr.*;
 import com.sun.jna.win32.StdCallLibrary;
-import com.sun.jna.win32.W32APIOptions;
 
 public interface Libmem extends StdCallLibrary {
 
-    Libmem INSTANCE = Native.load("libmem", Libmem.class, W32APIOptions.DEFAULT_OPTIONS);
+    Libmem INSTANCE = Native.load("libmem", Libmem.class);
 
-    boolean LM_EnumProcesses(LMProcessCallback callback);
+    int LM_NULL = 0;
+    Pointer LM_NULLPTR = new Pointer(LM_NULL);
+    int LM_PID_BAD = -1;
+    int LM_TID_BAD = -1;
+    long LM_ADDRESS_BAD = -1L;
+    int LM_PATH_MAX = 4096;
+    int LM_INST_MAX = 16;
+    int LM_PROT_NONE = 0;
+    int LM_PROT_R = 1;
+    int LM_PROT_W = 1 << 1;
+    int LM_PROT_X = 1 << 2;
+    int LM_PROT_XR = LM_PROT_X | LM_PROT_R;
+    int LM_PROT_XW = LM_PROT_X | LM_PROT_W;
+    int LM_PROT_RW = LM_PROT_R | LM_PROT_W;
+    int LM_PROT_XRW = LM_PROT_X | LM_PROT_R | LM_PROT_W;
 
-    boolean LM_GetProcess(LMProcess process);
+    @Structure.FieldOrder({"pid", "ppid", "arch", "bits", "start_time", "path", "name"})
+    public static class LmProcess extends Structure {
+        public int pid;
+        public int ppid;
+        public int arch;
+        public long bits;
+        public long start_time;
+        public byte[] path = new byte[LM_PATH_MAX];
+        public byte[] name = new byte[LM_PATH_MAX];
 
-    boolean LM_GetProcessEx(int pid, LMProcess process);
+        public static class ByReference extends LmProcess implements Structure.ByReference {}
 
-    boolean LM_FindProcess(byte[] name, LMProcess process);
+        @Override
+        public String toString() {
+            return String.format("LmProcess{pid=%d, ppid=%d, arch=%d, bits=%d, start_time=%d, path=%s, name=%s}",
+                    pid, ppid, arch, bits, start_time, Native.toString(path).trim(), Native.toString(name).trim());
+        }
+    }
 
-    boolean LM_IsProcessAlive(LMProcess process);
+    @Structure.FieldOrder({"tid", "owner_pid"})
+    public static class LmThread extends Structure {
+        public int tid;
+        public int owner_pid;
 
-    void LM_GetSystemBits(IntByReference bits);
+        public static class ByReference extends LmThread implements Structure.ByReference {}
 
-    boolean LM_EnumThreads(LMThreadCallback callback);
+        @Override
+        public String toString() {
+            return String.format("LmThread{tid=%d, owner_pid=%d}", tid, owner_pid);
+        }
+    }
 
-    boolean LM_EnumThreadsEx(LMProcess process, LMThreadCallback callback);
+    @Structure.FieldOrder({"base", "end", "size", "path", "name"})
+    public static class LmModule extends Structure {
+        public long base;
+        public long end;
+        public long size;
+        public byte[] path = new byte[LM_PATH_MAX];
+        public byte[] name = new byte[LM_PATH_MAX];
 
-    boolean LM_GetThread(LMThread thread);
+        public static class ByReference extends LmModule implements Structure.ByReference {}
 
-    boolean LM_GetThreadEx(LMProcess process, LMThread thread);
+        @Override
+        public String toString() {
+            return String.format("LmModule{base=0x%x, end=0x%x, size=%d, path=%s, name=%s}",
+                    base, end, size, Native.toString(path).trim(), Native.toString(name).trim());
+        }
+    }
 
-    boolean LM_GetThreadProcess(LMThread thread, LMProcess process);
+    @Structure.FieldOrder({"base", "end", "size", "prot"})
+    public static class LmSegment extends Structure {
+        public long base;
+        public long end;
+        public long size;
+        public int prot;
 
-    boolean LM_EnumModules(LMModuleCallback callback);
+        public static class ByReference extends LmSegment implements Structure.ByReference {}
 
-    boolean LM_EnumModulesEx(LMProcess process, LMModuleCallback callback);
+        @Override
+        public String toString() {
+            return String.format("LmSegment{base=0x%x, end=0x%x, size=%d, prot=%d}", base, end, size, prot);
+        }
+    }
 
-    boolean LM_FindModule(String name, LMModule module);
+    @Structure.FieldOrder({"address", "size", "bytes", "mnemonic", "opStr"})
+    public static class LmInst extends Structure {
+        public long address;
+        public int size;
+        public byte[] bytes = new byte[LM_INST_MAX];
+        public byte[] mnemonic = new byte[32];
+        public byte[] opStr = new byte[160];
 
-    boolean LM_FindModuleEx(LMProcess process, String name, LMModule module);
+        public static class ByReference extends LmInst implements Structure.ByReference {}
 
-    boolean LM_LoadModule(String path);
+        @Override
+        public String toString() {
+            return String.format("LmInst{address=0x%x, size=%d, bytes=%s, mnemonic=%s, opStr=%s}",
+                    address, size, Native.toString(bytes).trim(), Native.toString(mnemonic).trim(), Native.toString(opStr).trim());
+        }
+    }
 
-    boolean LM_LoadModuleEx(LMProcess process, String path, LMModule module);
+    @Structure.FieldOrder({"vtable", "hkentries"})
+    public static class LmVmt extends Structure {
+        public Pointer vtable;
+        public Pointer hkentries;
 
-    boolean LM_UnloadModule(LMModule module);
+        public static class ByReference extends LmVmt implements Structure.ByReference {}
 
-    boolean LM_UnloadModuleEx(LMProcess process, LMModule module);
+        @Override
+        public String toString() {
+            return String.format("LmVmt{vtable=%s, hkentries=%s}", vtable, hkentries);
+        }
+    }
 
-    boolean LM_EnumSymbols(LMModule module, LMSymbolCallback callback);
+    public interface EnumProcessesCallback extends StdCallLibrary.StdCallCallback {
+        boolean callback(LmProcess process, Pointer arg);
+    }
 
-    boolean LM_FindSymboladdr(LMSymbol symbol);
+    public interface EnumThreadsCallback extends StdCallLibrary.StdCallCallback {
+        boolean callback(LmThread thread, Pointer arg);
+    }
 
-    boolean LM_EnumPages(LMPageCallback callback);
+    public interface EnumModulesCallback extends StdCallLibrary.StdCallCallback {
+        boolean callback(LmModule module, Pointer arg);
+    }
 
-    boolean LM_EnumPagesEx(LMProcess process, LMPageCallback callback);
+    public interface EnumSegmentsCallback extends StdCallLibrary.StdCallCallback {
+        boolean callback(LmSegment segment, Pointer arg);
+    }
 
-    boolean LM_GetPage(int addr, LMPage page);
+    public interface EnumSymbolsCallback extends StdCallLibrary.StdCallCallback {
+        boolean callback(LmModule module, Pointer arg);
+    }
 
-    boolean LM_GetPageEx(LMProcess process, int addr, LMPage page);
+    // 枚举进程
+    boolean LM_EnumProcesses(EnumProcessesCallback callback);
 
-    boolean LM_ReadMemory(int src, IntByReference dst, int size);
+    // 获取当前进程信息
+    boolean LM_GetProcess(LmProcess.ByReference processOut);
 
-    boolean LM_ReadMemoryEx(LMProcess process, int src, IntByReference dst, int size);
+    // 根据进程ID获取进程信息
+    boolean LM_GetProcessEx(int pid, LmProcess.ByReference processOut);
 
-    boolean LM_WriteMemory(int dst, IntByReference src, int size);
+    // 查找进程
+    boolean LM_FindProcess(String processName, LmProcess.ByReference processOut);
 
-    boolean LM_WriteMemoryEx(LMProcess process, int dst, IntByReference src, int size);
+    // 检查进程是否存活
+    boolean LM_IsProcessAlive(LmProcess process);
 
-    boolean LM_SetMemory(int dst, char ch, int size);
+    // 获取当前进程的位数
+    int LM_GetBits();
 
-    boolean LM_SetMemoryEx(LMProcess process, int dst, char ch, int size);
+    // 获取系统架构的位数
+    int LM_GetSystemBits();
 
-    boolean LM_ProtMemory(int addr, int size, int prot, IntByReference prev);
+    // 枚举线程
+    boolean LM_EnumThreads(EnumThreadsCallback callback, Pointer arg);
 
-    boolean LM_ProtMemoryEx(LMProcess process, int addr, int size, int prot, IntByReference prev);
+    // 枚举指定进程中的线程
+    boolean LM_EnumThreadsEx(LmProcess process, EnumThreadsCallback callback, Pointer arg);
 
-    boolean LM_AllocMemory(int size, int prot);
+    // 获取当前线程信息
+    boolean LM_GetThread(LmThread.ByReference threadOut);
 
-    boolean LM_AllocMemoryEx(LMProcess process, int size, int prot);
+    // 获取指定进程的线程信息
+    boolean LM_GetThreadEx(LmProcess process, LmThread.ByReference threadOut);
 
-    boolean LM_FreeMemory(int alloc, int size);
+    // 获取线程所属的进程
+    boolean LM_GetThreadProcess(LmThread thread, LmProcess.ByReference processOut);
 
-    boolean LM_FreeMemoryEx(LMProcess process, int alloc, int size);
+    // 枚举模块
+    boolean LM_EnumModules(EnumModulesCallback callback, Pointer arg);
 
-    boolean LM_DataScan(byte[] data, int size, int addr, int scanSize);
+    // 枚举指定进程的模块
+    boolean LM_EnumModulesEx(LmProcess process, EnumModulesCallback callback, Pointer arg);
 
-    boolean LM_DataScanEx(LMProcess process, byte[] data, int size, int addr, int scanSize);
+    // 查找模块
+    boolean LM_FindModule(String name, LmModule.ByReference moduleOut);
 
-    boolean LM_PatternScan(byte[] pattern, String mask, int addr, int scanSize);
+    // 在指定进程中查找模块
+    boolean LM_FindModuleEx(LmProcess process, String name, LmModule.ByReference moduleOut);
 
-    boolean LM_PatternScanEx(LMProcess process, byte[] pattern, String mask, int addr, int scanSize);
+    // 加载模块
+    boolean LM_LoadModule(String path, LmModule.ByReference moduleOut);
 
-    boolean LM_SigScan(String sig, int addr, int scanSize);
+    // 在指定进程中加载模块
+    boolean LM_LoadModuleEx(LmProcess process, String path, LmModule.ByReference moduleOut);
 
-    boolean LM_SigScanEx(LMProcess process, String sig, int addr, int scanSize);
+    // 卸载模块
+    boolean LM_UnloadModule(LmModule module);
 
-    boolean LM_HookCode(int from, int to, IntByReference ptrampoline);
+    // 在指定进程中卸载模块
+    boolean LM_UnloadModuleEx(LmProcess process, LmModule module);
 
-    boolean LM_HookCode(LMProcess process, int from, int to, IntByReference ptrampoline);
+    // 查找符号地址
+    long LM_FindSymbolAddress(LmModule module, String symbolName);
 
-    boolean LM_UnhookCode(int from, int trampoline, int size);
+    // 解码符号名称
+    Pointer LM_DemangleSymbol(String symbolName, Pointer demangledBuf, int maxsize);
 
-    boolean LM_UnhookCodeEx(LMProcess process, int from, int trampoline, int size);
+    // 释放解码后的符号名称
+    void LM_FreeDemangledSymbol(Pointer symbolName);
 
-    boolean LM_Assemble(String code, LMInst inst);
+    // 在模块中枚举符号并解码
+    boolean LM_EnumSymbolsDemangled(LmModule module, EnumSymbolsCallback callback, Pointer arg);
 
-    boolean LM_AssembleEx(String code, int bits, int runtime_addr, LMInst inst, byte[] pcodebuf);
+    // 查找解码后的符号地址
+    long LM_FindSymbolAddressDemangled(LmModule module, String symbolName);
 
-    boolean LM_FreeCodeBuffer(byte[] pcodebuf);
+    // 枚举内存段
+    boolean LM_EnumSegments(EnumSegmentsCallback callback, Pointer arg);
 
-    boolean LM_Disassemble(int code, LMInst inst);
+    // 在指定进程中枚举内存段
+    boolean LM_EnumSegmentsEx(LmProcess process, EnumSegmentsCallback callback, Pointer arg);
 
-    boolean LM_DisassembleEx(int code, int size, int count, int runtime_addr, PointerByReference inst);
+    // 查找内存段
+    boolean LM_FindSegment(long address, LmSegment.ByReference segmentOut);
 
-    boolean LM_FreeInstructions(LMInst inst);
+    // 在指定进程中查找内存段
+    boolean LM_FindSegmentEx(LmProcess process, long address, LmSegment.ByReference segmentOut);
 
-    boolean LM_CodeLength(int code, int minlength);
+    // 读取内存
+    long LM_ReadMemory(long source, Pointer dest, long size);
 
-    boolean LM_CodeLengthEx(LMProcess process, int code, int minlength);
+    // 在指定进程中读取内存
+    long LM_ReadMemoryEx(LmProcess process, long source, Pointer dest, long size);
 
-    boolean LM_VmtNew(IntByReference vtable, LMVmt vmt);
+    // 写入内存
+    long LM_WriteMemory(long dest, Pointer source, long size);
 
-    boolean LM_VmtHook(LMVmt vmt, int index, int dst);
+    // 在指定进程中写入内存
+    long LM_WriteMemoryEx(LmProcess process, long dest, Pointer source, long size);
 
-    boolean LM_VmtUnhook(LMVmt vmt, int index);
+    // 设置内存值
+    long LM_SetMemory(long dest, byte value, long size);
 
-    boolean LM_VmtGetOriginal(LMVmt vmt, int index);
+    // 在指定进程中设置内存值
+    long LM_SetMemoryEx(LmProcess process, long dest, byte value, long size);
 
-    boolean LM_VmtReset(LMVmt vmt);
+    // 修改内存保护
+    boolean LM_ProtMemory(long address, long size, int prot, IntByReference oldProtOut);
 
-    boolean LM_VmtFree(LMVmt vmt);
+    // 在指定进程中修改内存保护
+    boolean LM_ProtMemoryEx(LmProcess process, long address, long size, int prot, IntByReference oldProtOut);
 
+    // 分配内存
+    long LM_AllocMemory(long size, int prot);
+
+    // 在指定进程中分配内存
+    long LM_AllocMemoryEx(LmProcess process, long size, int prot);
+
+    // 释放内存
+    boolean LM_FreeMemory(long alloc, long size);
+
+    // 在指定进程中释放内存
+    boolean LM_FreeMemoryEx(LmProcess process, long alloc, long size);
+
+    // 深指针操作
+    long LM_DeepPointer(long base, long[] offsets, int noffsets);
+
+    // 在指定进程中进行深指针操作
+    long LM_DeepPointerEx(LmProcess process, long base, long[] offsets, int noffsets);
+
+    // 内存扫描
+    long LM_DataScan(Pointer data, long datasize, long address, long scansize);
+
+    // 在指定进程中进行内存扫描
+    long LM_DataScanEx(LmProcess process, Pointer data, long datasize, long address, long scansize);
+
+    // 模式扫描
+    long LM_PatternScan(Pointer pattern, String mask, long address, long scansize);
+
+    // 在指定进程中进行模式扫描
+    long LM_PatternScanEx(LmProcess process, Pointer pattern, String mask, long address, long scansize);
+
+    // 签名扫描
+    long LM_SigScan(String signature, long address, long scansize);
+
+    // 在指定进程中进行签名扫描
+    long LM_SigScanEx(LmProcess process, String signature, long address, long scansize);
+
+    // 获取架构信息
+    int LM_GetArchitecture();
+
+    // 汇编指令
+    boolean LM_Assemble(String code, LmInst.ByReference instructionOut);
+
+    // 扩展汇编指令
+    long LM_AssembleEx(String code, int arch, long runtimeAddress, PointerByReference payloadOut);
+
+    // 释放汇编代码
+    void LM_FreePayload(Pointer payload);
+
+    // 反汇编指令
+    boolean LM_Disassemble(long machineCode, LmInst.ByReference instructionOut);
+
+    // 扩展反汇编指令
+    long LM_DisassembleEx(long machineCode, int arch, long maxSize, long instructionCount, long runtimeAddress, PointerByReference instructionsOut);
+
+    // 释放反汇编指令
+    void LM_FreeInstructions(Pointer instructions);
+
+    // 计算代码长度
+    long LM_CodeLength(long machineCode, long minLength);
+
+    // 在指定进程中计算代码长度
+    long LM_CodeLengthEx(LmProcess process, long machineCode, long minLength);
+
+    // 安装代码钩子
+    long LM_HookCode(long from, long to, LongByReference trampolineOut);
+
+    // 在指定进程中安装代码钩子
+    long LM_HookCodeEx(LmProcess process, long from, long to, LongByReference trampolineOut);
+
+    // 移除代码钩子
+    boolean LM_UnhookCode(long from, long trampoline, long size);
+
+    // 在指定进程中移除代码钩子
+    boolean LM_UnhookCodeEx(LmProcess process, long from, long trampoline, long size);
+
+    // 创建新的虚拟方法表
+    boolean LM_VmtNew(Pointer vtable, LmVmt.ByReference vmtOut);
+
+    // 安装虚拟方法表钩子
+    boolean LM_VmtHook(LmVmt vmt, long fromFnIndex, long to);
+
+    // 移除虚拟方法表钩子
+    boolean LM_VmtUnhook(LmVmt vmt, long fnIndex);
+
+    // 获取虚拟方法表原始函数
+    long LM_VmtGetOriginal(LmVmt vmt, long fnIndex);
+
+    // 重置虚拟方法表
+    void LM_VmtReset(LmVmt vmt);
+
+    // 释放虚拟方法表
+    void LM_VmtFree(LmVmt vmt);
 }
