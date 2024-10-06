@@ -307,10 +307,8 @@ public final class LibmemUtils {
      * @param data 要写入的数据
      * @return 写入长度
      */
-    public static long writeMemory(long address, byte[] data) {
-        Memory buffer = new Memory(data.length);
-        buffer.write(0, data, 0, data.length);
-        return Libmem.INSTANCE.LM_WriteMemory(address, buffer, data.length);
+    public static long writeMemory(long address, Memory memory) {
+        return Libmem.INSTANCE.LM_WriteMemory(address, memory, memory.size());
     }
 
     /**
@@ -321,10 +319,8 @@ public final class LibmemUtils {
      * @param data 要写入的数据
      * @return 写入长度
      */
-    public static long writeMemory(LmProcess process, long address, byte[] data) {
-        Memory buffer = new Memory(data.length);
-        buffer.write(0, data, 0, data.length);
-        return Libmem.INSTANCE.LM_WriteMemoryEx(process.toRef(), address, buffer, data.length);
+    public static long writeMemory(LmProcess process, long address, Memory memory) {
+        return Libmem.INSTANCE.LM_WriteMemoryEx(process.toRef(), address, memory, memory.size());
     }
 
     /**
