@@ -278,11 +278,12 @@ public final class LibmemUtils {
      *
      * @param address 内存地址
      * @param size 要读取的字节数
-     * @return 包含读取地址的值
+     * @return 读取数据的内存
      */
-    public static long readMemory(long address, long size) {
+    public static Memory readMemory(long address, long size) {
         Memory buffer = new Memory(size);
-        return Libmem.INSTANCE.LM_ReadMemory(address, buffer, size);
+        Libmem.INSTANCE.LM_ReadMemory(address, buffer, size);
+        return buffer;
     }
 
     /**
@@ -291,17 +292,12 @@ public final class LibmemUtils {
      * @param process 进程对象
      * @param address 内存地址
      * @param size 要读取的字节数
-     * @return 包含读取数据的字节数组
+     * @return 读取数据的内存
      */
-    public static byte[] readMemory(LmProcess process, long address, long size) {
+    public static Memory readMemory(LmProcess process, long address, long size) {
         Memory buffer = new Memory(size);
-        long bytesRead = Libmem.INSTANCE.LM_ReadMemoryEx(process.toRef(), address, buffer, size);
-        if (bytesRead == size) {
-            byte[] data = new byte[(int) size];
-            buffer.read(0, data, 0, (int) size);
-            return data;
-        }
-        return new byte[] {};
+        Libmem.INSTANCE.LM_ReadMemoryEx(process.toRef(), address, buffer, size);
+        return buffer;
     }
 
     /**
@@ -309,13 +305,12 @@ public final class LibmemUtils {
      *
      * @param address 内存地址
      * @param data 要写入的数据
-     * @return 如果写入成功返回 true 否则返回 false
+     * @return 写入长度
      */
-    public static boolean writeMemory(long address, byte[] data) {
+    public static long writeMemory(long address, byte[] data) {
         Memory buffer = new Memory(data.length);
         buffer.write(0, data, 0, data.length);
-        long bytesWritten = Libmem.INSTANCE.LM_WriteMemory(address, buffer, data.length);
-        return bytesWritten == data.length;
+        return Libmem.INSTANCE.LM_WriteMemory(address, buffer, data.length);
     }
 
     /**
@@ -324,13 +319,12 @@ public final class LibmemUtils {
      * @param process 进程对象
      * @param address 内存地址
      * @param data 要写入的数据
-     * @return 如果写入成功返回 true 否则返回 false
+     * @return 写入长度
      */
-    public static boolean writeMemory(LmProcess process, long address, byte[] data) {
+    public static long writeMemory(LmProcess process, long address, byte[] data) {
         Memory buffer = new Memory(data.length);
         buffer.write(0, data, 0, data.length);
-        long bytesWritten = Libmem.INSTANCE.LM_WriteMemoryEx(process.toRef(), address, buffer, data.length);
-        return bytesWritten == data.length;
+        return Libmem.INSTANCE.LM_WriteMemoryEx(process.toRef(), address, buffer, data.length);
     }
 
     /**
