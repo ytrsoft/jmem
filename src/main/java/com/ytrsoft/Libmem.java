@@ -1,28 +1,21 @@
 package com.ytrsoft;
 
-import com.sun.jna.*;
-import com.sun.jna.ptr.*;
+import com.sun.jna.Native;
+import com.sun.jna.Pointer;
+import com.sun.jna.Structure;
+import com.sun.jna.ptr.IntByReference;
+import com.sun.jna.ptr.LongByReference;
+import com.sun.jna.ptr.PointerByReference;
 import com.sun.jna.win32.StdCallLibrary;
 
 public interface Libmem extends StdCallLibrary {
 
     Libmem INSTANCE = Native.load("libmem", Libmem.class);
 
-    int LM_NULL = 0;
-    Pointer LM_NULLPTR = new Pointer(LM_NULL);
-    int LM_PID_BAD = -1;
-    int LM_TID_BAD = -1;
-    long LM_ADDRESS_BAD = -1L;
     int LM_PATH_MAX = 4096;
     int LM_INST_MAX = 16;
-    int LM_PROT_NONE = 0;
-    int LM_PROT_R = 1;
-    int LM_PROT_W = 1 << 1;
-    int LM_PROT_X = 1 << 2;
-    int LM_PROT_XR = LM_PROT_X | LM_PROT_R;
-    int LM_PROT_XW = LM_PROT_X | LM_PROT_W;
-    int LM_PROT_RW = LM_PROT_R | LM_PROT_W;
-    int LM_PROT_XRW = LM_PROT_X | LM_PROT_R | LM_PROT_W;
+    int LM_MNEMONIC_MAX = 32;
+    int LM_OP_MAX = 160;
 
     @Structure.FieldOrder({"pid", "ppid", "arch", "bits", "start_time", "path", "name"})
     public static class LmProcess extends Structure {
@@ -49,11 +42,6 @@ public interface Libmem extends StdCallLibrary {
         public int owner_pid;
 
         public static class ByReference extends LmThread implements Structure.ByReference {}
-
-        @Override
-        public String toString() {
-            return String.format("LmThread{tid=%d, owner_pid=%d}", tid, owner_pid);
-        }
     }
 
     @Structure.FieldOrder({"base", "end", "size", "path", "name"})
@@ -65,12 +53,6 @@ public interface Libmem extends StdCallLibrary {
         public byte[] name = new byte[LM_PATH_MAX];
 
         public static class ByReference extends LmModule implements Structure.ByReference {}
-
-        @Override
-        public String toString() {
-            return String.format("LmModule{base=0x%x, end=0x%x, size=%d, path=%s, name=%s}",
-                    base, end, size, Native.toString(path).trim(), Native.toString(name).trim());
-        }
     }
 
     @Structure.FieldOrder({"base", "end", "size", "prot"})
@@ -81,11 +63,6 @@ public interface Libmem extends StdCallLibrary {
         public int prot;
 
         public static class ByReference extends LmSegment implements Structure.ByReference {}
-
-        @Override
-        public String toString() {
-            return String.format("LmSegment{base=0x%x, end=0x%x, size=%d, prot=%d}", base, end, size, prot);
-        }
     }
 
     @Structure.FieldOrder({"address", "size", "bytes", "mnemonic", "opStr"})
@@ -93,29 +70,25 @@ public interface Libmem extends StdCallLibrary {
         public long address;
         public int size;
         public byte[] bytes = new byte[LM_INST_MAX];
-        public byte[] mnemonic = new byte[32];
-        public byte[] opStr = new byte[160];
+        public byte[] mnemonic = new byte[LM_MNEMONIC_MAX];
+        public byte[] opStr = new byte[LM_OP_MAX];
 
         public static class ByReference extends LmInst implements Structure.ByReference {}
+    }
 
-        @Override
-        public String toString() {
-            return String.format("LmInst{address=0x%x, size=%d, bytes=%s, mnemonic=%s, opStr=%s}",
-                    address, size, Native.toString(bytes).trim(), Native.toString(mnemonic).trim(), Native.toString(opStr).trim());
-        }
+    @Structure.FieldOrder({"orig_func", "index", "next"})
+    public static class LmVmtEntry extends Structure {
+        public Pointer orig_func;
+        public long index;
+        public LmVmtEntry.ByReference next;
+        public static class ByReference extends LmVmtEntry implements Structure.ByReference {}
     }
 
     @Structure.FieldOrder({"vtable", "hkentries"})
     public static class LmVmt extends Structure {
         public Pointer vtable;
-        public Pointer hkentries;
-
+        public LmVmtEntry.ByReference hkentries;
         public static class ByReference extends LmVmt implements Structure.ByReference {}
-
-        @Override
-        public String toString() {
-            return String.format("LmVmt{vtable=%s, hkentries=%s}", vtable, hkentries);
-        }
     }
 
     public interface EnumProcessesCallback extends StdCallLibrary.StdCallCallback {
