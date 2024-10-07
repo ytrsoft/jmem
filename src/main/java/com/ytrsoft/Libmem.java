@@ -157,7 +157,7 @@ public interface Libmem extends StdCallLibrary {
 
     Pointer LM_DemangleSymbol(String symbolName, Pointer demangledBuf, int maxsize);
 
-    void LM_FreeDemangledSymbol(Pointer symbolName);
+    void LM_FreeDemangledSymbol(String symbolName);
 
     boolean LM_EnumSymbolsDemangled(LmModule module, EnumSymbolsCallback callback, Pointer arg);
 

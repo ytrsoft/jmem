@@ -316,7 +316,6 @@ public final class LibmemUtils {
      *
      * @param process 进程对象
      * @param address 内存地址
-     * @param data 要写入的数据
      * @return 写入长度
      */
     public static long writeMemory(LmProcess process, long address, Memory memory) {
@@ -331,9 +330,9 @@ public final class LibmemUtils {
      * @param protection 新的保护属性
      * @return 如果修改成功返回 true 否则返回 false
      */
-    public static boolean protectMemory(long address, long size, int protection) {
+    public static boolean protectMemory(long address, long size, Protection protection) {
         IntByReference oldProtection = new IntByReference();
-        return Libmem.INSTANCE.LM_ProtMemory(address, size, protection, oldProtection);
+        return Libmem.INSTANCE.LM_ProtMemory(address, size, protection.getValue(), oldProtection);
     }
 
     /**
@@ -345,9 +344,9 @@ public final class LibmemUtils {
      * @param protection 新的保护属性
      * @return 如果修改成功返回 true 否则返回 false
      */
-    public static boolean protectMemory(LmProcess process, long address, long size, int protection) {
+    public static boolean protectMemory(LmProcess process, long address, long size, Protection protection) {
         IntByReference oldProtection = new IntByReference();
-        return Libmem.INSTANCE.LM_ProtMemoryEx(process.toRef(), address, size, protection, oldProtection);
+        return Libmem.INSTANCE.LM_ProtMemoryEx(process.toRef(), address, size, protection.getValue(), oldProtection);
     }
 
     /**
@@ -357,8 +356,8 @@ public final class LibmemUtils {
      * @param protection 内存保护属性
      * @return 分配的内存地址
      */
-    public static long allocateMemory(long size, int protection) {
-        return Libmem.INSTANCE.LM_AllocMemory(size, protection);
+    public static long allocateMemory(long size, Protection protection) {
+        return Libmem.INSTANCE.LM_AllocMemory(size, protection.getValue());
     }
 
     /**
@@ -369,8 +368,8 @@ public final class LibmemUtils {
      * @param protection 内存保护属性
      * @return 分配的内存地址
      */
-    public static long allocateMemory(LmProcess process, long size, int protection) {
-        return Libmem.INSTANCE.LM_AllocMemoryEx(process.toRef(), size, protection);
+    public static long allocateMemory(LmProcess process, long size, Protection protection) {
+        return Libmem.INSTANCE.LM_AllocMemoryEx(process.toRef(), size, protection.getValue());
     }
 
     /**
@@ -404,20 +403,20 @@ public final class LibmemUtils {
      * @param offsets 偏移量数组
      * @return 计算后的内存地址
      */
-    public static long deepPointer(LmProcess process, long base, long[] offsets) {
-        return Libmem.INSTANCE.LM_DeepPointerEx(process.toRef(), base, offsets, offsets.length);
-    }
+        public static long deepPointer(LmProcess process, long base, long[] offsets) {
+            return Libmem.INSTANCE.LM_DeepPointerEx(process.toRef(), base, offsets, offsets.length);
+        }
 
-    /**
-     * 执行深指针操作 通过基础地址和偏移量计算内存地址
-     *
-     * @param base 基础地址
-     * @param offsets 偏移量数组
-     * @return 计算后的内存地址
-     */
-    public static long deepPointer(long base, long[] offsets) {
-        return Libmem.INSTANCE.LM_DeepPointer(base, offsets, offsets.length);
-    }
+        /**
+         * 执行深指针操作 通过基础地址和偏移量计算内存地址
+         *
+         * @param base 基础地址
+         * @param offsets 偏移量数组
+         * @return 计算后的内存地址
+         */
+        public static long deepPointer(long base, long[] offsets) {
+            return Libmem.INSTANCE.LM_DeepPointer(base, offsets, offsets.length);
+        }
 
     /**
      * 获取所有的内存段信息
@@ -555,7 +554,7 @@ public final class LibmemUtils {
      *
      * @param symbolName 符号名称指针
      */
-    public static void freeDemangledSymbol(Pointer symbolName) {
+    public static void freeDemangledSymbol(String symbolName) {
         Libmem.INSTANCE.LM_FreeDemangledSymbol(symbolName);
     }
 
@@ -569,9 +568,9 @@ public final class LibmemUtils {
      * @param runtimeAddress 运行时地址
      * @return 反汇编后的指令数
      */
-    public static long disassemble(LmProcess process, long machineCode, int arch, long maxSize, long instructionCount, long runtimeAddress) {
+    public static long disassemble(LmProcess process, long machineCode, Architecture arch, long maxSize, long instructionCount, long runtimeAddress) {
         PointerByReference instructionsOut = new PointerByReference();
-        return Libmem.INSTANCE.LM_DisassembleEx(machineCode, arch, maxSize, instructionCount, runtimeAddress, instructionsOut);
+        return Libmem.INSTANCE.LM_DisassembleEx(machineCode, arch.getValue(), maxSize, instructionCount, runtimeAddress, instructionsOut);
     }
 
     /**
