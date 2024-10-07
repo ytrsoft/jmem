@@ -774,8 +774,8 @@ public final class LibmemUtils {
      * @param payloadOut 用于存储输出的代码段
      * @return 汇编后的机器代码地址
      */
-    public static long assembleEx(String code, int arch, long runtimeAddress, PointerByReference payloadOut) {
-        return Libmem.INSTANCE.LM_AssembleEx(code, arch, runtimeAddress, payloadOut);
+    public static long assembleEx(String code, Architecture arch, long runtimeAddress, PointerByReference payloadOut) {
+        return Libmem.INSTANCE.LM_AssembleEx(code, arch.getValue(), runtimeAddress, payloadOut);
     }
 
     /**
