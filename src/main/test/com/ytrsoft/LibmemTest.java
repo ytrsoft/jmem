@@ -1,9 +1,6 @@
 package com.ytrsoft;
 
 import com.sun.jna.Memory;
-import com.sun.jna.Native;
-import com.sun.jna.Pointer;
-import com.sun.jna.platform.win32.Kernel32Util;
 import com.sun.jna.ptr.LongByReference;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +37,7 @@ public class LibmemTest {
 
     @Test
     public void testGetArchitecture() {
-        Architecture arch = LibmemUtils.getArchitecture();
+        Arch arch = LibmemUtils.getArchitecture();
         System.out.println(arch);
     }
 
@@ -285,7 +282,7 @@ public class LibmemTest {
     public void testGetCodeLengthEx() {
         long machineCode = 0x00400000;
         long minLength = 4;
-        long codeLength = LibmemUtils.getCodeLengthEx(MarioXP_0121, machineCode, minLength);
+        long codeLength = LibmemUtils.getCodeLength(MarioXP_0121, machineCode, minLength);
         System.out.println(codeLength);
     }
 
@@ -336,7 +333,7 @@ public class LibmemTest {
         long instructionCount = 10;
         long runtimeAddress = 0x00400000;
         long machineCodeAddress = 0x00400000;
-        long result = LibmemUtils.disassemble(MarioXP_0121, machineCodeAddress, Architecture.X86, maxSize, instructionCount, runtimeAddress);
+        long result = LibmemUtils.disassemble(machineCodeAddress, Arch.X86, maxSize, instructionCount, runtimeAddress);
         System.out.println(result);
     }
 
