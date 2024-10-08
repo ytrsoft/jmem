@@ -1,6 +1,6 @@
 package com.ytrsoft;
 
-public enum Architecture {
+public enum Arch {
     NONE(-1),
 
     ARMV7(0),
@@ -34,7 +34,7 @@ public enum Architecture {
 
     private final int value;
 
-    Architecture(int value) {
+    Arch(int value) {
         this.value = value;
     }
 
@@ -42,13 +42,13 @@ public enum Architecture {
         return value;
     }
 
-    public static Architecture fromValue(int value) {
-        Architecture[] values = Architecture.values();
-        for(Architecture v: values) {
+    public static Arch valueOf(int value) {
+        Arch[] values = Arch.values();
+        for(Arch v: values) {
             if (v.getValue() == value) {
                 return v;
             }
         }
-        return Architecture.NONE;
+        return Arch.NONE;
     }
 }

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Libmem 工具类
+ *  内存逆向工具类
  */
 public final class LibmemUtils {
 
@@ -40,15 +40,15 @@ public final class LibmemUtils {
      *
      * @return 架构标识
      */
-    public static Architecture getArchitecture() {
+    public static Arch getArchitecture() {
         int arch = Libmem.INSTANCE.LM_GetArchitecture();
-        return Architecture.fromValue(arch);
+        return Arch.valueOf(arch);
     }
 
     /**
-     * 获取所有正在运行的进程列表
+     * 获取当前系统所有进程信息
      *
-     * @return 包含进程的 LmProcess 对象列表
+     * @return 所有进程信息
      */
     public static List<LmProcess> getProcesses() {
         List<LmProcess> processList = new ArrayList<>();
@@ -63,7 +63,7 @@ public final class LibmemUtils {
     /**
      * 获取当前进程的信息
      *
-     * @return 表示当前进程的 LmProcess 对象
+     * @return 当前进程信息
      */
     public static LmProcess getCurrentProcess() {
         Libmem.LmProcess.ByReference nativeProcess = new Libmem.LmProcess.ByReference();
@@ -75,7 +75,7 @@ public final class LibmemUtils {
      * 根据进程 ID 获取进程信息
      *
      * @param processId 进程 ID
-     * @return 表示进程的 LmProcess 对象
+     * @return 进程信息
      */
     public static LmProcess getProcessById(int processId) {
         Libmem.LmProcess.ByReference nativeProcess = new Libmem.LmProcess.ByReference();
@@ -87,7 +87,7 @@ public final class LibmemUtils {
      * 根据进程名称获取进程信息
      *
      * @param processName 进程名称
-     * @return 表示进程的 LmProcess 对象
+     * @return 进程信息
      */
     public static LmProcess getProcessByName(String processName) {
         Libmem.LmProcess.ByReference nativeProcess = new Libmem.LmProcess.ByReference();
@@ -106,9 +106,9 @@ public final class LibmemUtils {
     }
 
     /**
-     * 获取所有正在运行的线程列表
+     * 获取系统所有线程信息
      *
-     * @return 包含线程的 LmThread 对象列表
+     * @return 所有线程信息
      */
     public static List<LmThread> getThreads() {
         List<LmThread> threadList = new ArrayList<>();
@@ -121,10 +121,10 @@ public final class LibmemUtils {
     }
 
     /**
-     * 获取指定进程的所有线程
+     * 获取指定进程的所有线程信息
      *
      * @param process 进程对象
-     * @return 包含线程的 LmThread 对象列表
+     * @return 所有包含的线程信息
      */
     public static List<LmThread> getThreads(LmProcess process) {
         List<LmThread> threadList = new ArrayList<>();
@@ -140,7 +140,7 @@ public final class LibmemUtils {
      * 获取指定线程所属的进程
      *
      * @param thread 线程对象
-     * @return 表示线程所属进程的 LmProcess 对象
+     * @return 进程信息
      */
     public static LmProcess getThreadProcess(LmThread thread) {
         Libmem.LmProcess.ByReference nativeProcess = new Libmem.LmProcess.ByReference();
@@ -149,10 +149,10 @@ public final class LibmemUtils {
     }
 
     /**
-     * 获取指定进程中的线程信息
+     * 获取给定进程中指定线程的信息
      *
      * @param process 进程对象
-     * @return 表示线程的 LmThread 对象
+     * @return 进程信息
      */
     public static LmThread getThread(LmProcess process) {
         Libmem.LmThread.ByReference nativeThread = new Libmem.LmThread.ByReference();
@@ -163,7 +163,7 @@ public final class LibmemUtils {
     /**
      * 获取当前线程的信息
      *
-     * @return 表示当前线程的 LmThread 对象
+     * @return 进程信息
      */
     public static LmThread getCurrentThread() {
         Libmem.LmThread.ByReference nativeThread = new Libmem.LmThread.ByReference();
@@ -174,7 +174,7 @@ public final class LibmemUtils {
     /**
      * 获取当前进程中加载的所有模块
      *
-     * @return 包含模块的 LmModule 对象列表
+     * @return 所有模块信息
      */
     public static List<LmModule> getModules() {
         List<LmModule> moduleList = new ArrayList<>();
@@ -190,7 +190,7 @@ public final class LibmemUtils {
      * 获取指定进程中加载的所有模块
      *
      * @param process 进程对象
-     * @return 包含模块的 LmModule 对象列表
+     * @return 所有模块信息
      */
     public static List<LmModule> getModules(LmProcess process) {
         List<LmModule> moduleList = new ArrayList<>();
@@ -206,7 +206,7 @@ public final class LibmemUtils {
      * 根据模块名称获取模块信息
      *
      * @param moduleName 模块名称
-     * @return 表示模块的 LmModule 对象
+     * @return 模块信息
      */
     public static LmModule getModuleByName(String moduleName) {
         Libmem.LmModule.ByReference nativeModule = new Libmem.LmModule.ByReference();
@@ -219,7 +219,7 @@ public final class LibmemUtils {
      *
      * @param process 进程对象
      * @param moduleName 模块名称
-     * @return 表示模块的 LmModule 对象
+     * @return 模块信息
      */
     public static LmModule getModuleByName(LmProcess process, String moduleName) {
         Libmem.LmModule.ByReference nativeModule = new Libmem.LmModule.ByReference();
@@ -231,7 +231,7 @@ public final class LibmemUtils {
      * 根据模块路径加载模块
      *
      * @param path 模块路径
-     * @return 表示加载模块的 LmModule 对象
+     * @return 模块信息
      */
     public static LmModule getModuleByPath(String path) {
         Libmem.LmModule.ByReference nativeModule = new Libmem.LmModule.ByReference();
@@ -244,7 +244,7 @@ public final class LibmemUtils {
      *
      * @param process 进程对象
      * @param path 模块路径
-     * @return 表示加载模块的 LmModule 对象
+     * @return 模块信息
      */
     public static LmModule getModuleByPath(LmProcess process, String path) {
         Libmem.LmModule.ByReference nativeModule = new Libmem.LmModule.ByReference();
@@ -278,7 +278,7 @@ public final class LibmemUtils {
      *
      * @param address 内存地址
      * @param size 要读取的字节数
-     * @return 读取数据的内存
+     * @return 读取的内存
      */
     public static Memory readMemory(long address, long size) {
         Memory buffer = new Memory(size);
@@ -292,7 +292,7 @@ public final class LibmemUtils {
      * @param process 进程对象
      * @param address 内存地址
      * @param size 要读取的字节数
-     * @return 读取数据的内存
+     * @return 读取的内存
      */
     public static Memory readMemory(LmProcess process, long address, long size) {
         Memory buffer = new Memory(size);
@@ -304,8 +304,8 @@ public final class LibmemUtils {
      * 向指定内存地址写入数据
      *
      * @param address 内存地址
-     * @param data 要写入的数据
-     * @return 写入长度
+     * @param memory 要写入的内存
+     * @return 成功写入的字节数
      */
     public static long writeMemory(long address, Memory memory) {
         return Libmem.INSTANCE.LM_WriteMemory(address, memory, memory.size());
@@ -316,7 +316,7 @@ public final class LibmemUtils {
      *
      * @param process 进程对象
      * @param address 内存地址
-     * @return 写入长度
+     * @return 成功写入的字节数
      */
     public static long writeMemory(LmProcess process, long address, Memory memory) {
         return Libmem.INSTANCE.LM_WriteMemoryEx(process.toRef(), address, memory, memory.size());
@@ -419,9 +419,9 @@ public final class LibmemUtils {
         }
 
     /**
-     * 获取所有的内存段信息
+     * 获取当前进程的索所有内存段信息
      *
-     * @return 包含内存段的 LmSegment 对象列表
+     * @return 所有内存段信息
      */
     public static List<LmSegment> getMemorySegments() {
         List<LmSegment> segmentList = new ArrayList<>();
@@ -437,7 +437,7 @@ public final class LibmemUtils {
      * 获取指定进程的内存段信息
      *
      * @param process 进程对象
-     * @return 包含内存段的 LmSegment 对象列表
+     * @return 所有内存段信息
      */
     public static List<LmSegment> getMemorySegments(LmProcess process) {
         List<LmSegment> segmentList = new ArrayList<>();
@@ -450,10 +450,10 @@ public final class LibmemUtils {
     }
 
     /**
-     * 获取指定地址的内存段
+     * 获取指定地址的内存段信息
      *
      * @param address 内存地址
-     * @return 表示内存段的 LmSegment 对象
+     * @return 内存段信息
      */
     public static LmSegment getSegment(long address) {
         Libmem.LmSegment.ByReference nativeSegment = new Libmem.LmSegment.ByReference();
@@ -466,7 +466,7 @@ public final class LibmemUtils {
      *
      * @param process 进程对象
      * @param address 内存地址
-     * @return 表示内存段的 LmSegment 对象
+     * @return 内存段信息
      */
     public static LmSegment getSegment(LmProcess process, long address) {
         Libmem.LmSegment.ByReference nativeSegment = new Libmem.LmSegment.ByReference();
@@ -475,10 +475,10 @@ public final class LibmemUtils {
     }
 
     /**
-     * 获取模块中的所有解码符号
+     * 获取模块中的带有解码名称的符号
      *
      * @param module 模块对象
-     * @return 包含符号的 LmSymbol 对象列表
+     * @return 所有带有解码名称的符号
      */
     public static List<LmSymbol> getSymbolsDemangled(LmModule module) {
         List<LmSymbol> symbolList = new ArrayList<>();
@@ -498,7 +498,7 @@ public final class LibmemUtils {
      * @param minLength 最小代码长度
      * @return 计算出的代码长度
      */
-    public static long getCodeLengthEx(LmProcess process, long machineCode, long minLength) {
+    public static long getCodeLength(LmProcess process, long machineCode, long minLength) {
         return Libmem.INSTANCE.LM_CodeLengthEx(process.toRef(), machineCode, minLength);
     }
 
@@ -568,7 +568,7 @@ public final class LibmemUtils {
      * @param runtimeAddress 运行时地址
      * @return 反汇编后的指令数
      */
-    public static long disassemble(LmProcess process, long machineCode, Architecture arch, long maxSize, long instructionCount, long runtimeAddress) {
+    public static long disassemble(long machineCode, Arch arch, long maxSize, long instructionCount, long runtimeAddress) {
         PointerByReference instructionsOut = new PointerByReference();
         return Libmem.INSTANCE.LM_DisassembleEx(machineCode, arch.getValue(), maxSize, instructionCount, runtimeAddress, instructionsOut);
     }
@@ -723,7 +723,7 @@ public final class LibmemUtils {
      * @param scanSize 搜索的内存大小
      * @return 匹配数据的内存地址 如果未找到返回 0
      */
-    public static long dataScanEx(LmProcess process, byte[] data, long dataSize, long address, long scanSize) {
+    public static long dataScan(LmProcess process, byte[] data, long dataSize, long address, long scanSize) {
         Memory dataMemory = new Memory(data.length);
         dataMemory.write(0, data, 0, data.length);
         return Libmem.INSTANCE.LM_DataScanEx(process.toRef(), dataMemory, dataSize, address, scanSize);
@@ -774,7 +774,7 @@ public final class LibmemUtils {
      * @param payloadOut 用于存储输出的代码段
      * @return 汇编后的机器代码地址
      */
-    public static long assembleEx(String code, Architecture arch, long runtimeAddress, PointerByReference payloadOut) {
+    public static long assemble(String code, Arch arch, long runtimeAddress, PointerByReference payloadOut) {
         return Libmem.INSTANCE.LM_AssembleEx(code, arch.getValue(), runtimeAddress, payloadOut);
     }
 
