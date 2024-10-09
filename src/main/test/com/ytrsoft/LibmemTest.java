@@ -36,8 +36,8 @@ public class LibmemTest {
     }
 
     @Test
-    public void testGetArchitecture() {
-        Arch arch = LibmemUtils.getArchitecture();
+    public void testGetArch() {
+        Arch arch = LibmemUtils.getArch();
         System.out.println(arch);
     }
 
@@ -122,7 +122,7 @@ public class LibmemTest {
     @Test
     public void testGetModulesByLmName() {
         File file = new File(modulePath);
-        LmModule module = LibmemUtils.getModuleByName(file.getPath());
+        LmModule module = LibmemUtils.getModuleByName(file.getName());
         System.out.println(module);
     }
 

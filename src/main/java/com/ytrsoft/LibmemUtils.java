@@ -40,7 +40,7 @@ public final class LibmemUtils {
      *
      * @return 架构标识
      */
-    public static Arch getArchitecture() {
+    public static Arch getArch() {
         int arch = Libmem.INSTANCE.LM_GetArchitecture();
         return Arch.valueOf(arch);
     }
