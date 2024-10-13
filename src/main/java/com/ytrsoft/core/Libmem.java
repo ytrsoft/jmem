@@ -1,4 +1,4 @@
-package com.ytrsoft;
+package com.ytrsoft.core;
 
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;

@@ -1,4 +1,4 @@
-package com.ytrsoft;
+package com.ytrsoft.core;
 
 public class LmSymbol {
     public String name;

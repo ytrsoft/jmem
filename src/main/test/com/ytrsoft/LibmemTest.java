@@ -2,6 +2,7 @@ package com.ytrsoft;
 
 import com.sun.jna.Memory;
 import com.sun.jna.ptr.LongByReference;
+import com.ytrsoft.core.*;
 import org.junit.Before;
 import org.junit.Test;
 

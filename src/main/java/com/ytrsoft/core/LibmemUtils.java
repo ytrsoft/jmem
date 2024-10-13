@@ -1,11 +1,14 @@
-package com.ytrsoft;
+package com.ytrsoft.core;
 
 import com.sun.jna.Memory;
 import com.sun.jna.Pointer;
+import com.sun.jna.platform.win32.*;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.LongByReference;
 import com.sun.jna.ptr.PointerByReference;
 
+import javax.swing.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 

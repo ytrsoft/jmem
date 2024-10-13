@@ -1,4 +1,4 @@
-package com.ytrsoft;
+package com.ytrsoft.core;
 
 public class LmModule {
     private long base;

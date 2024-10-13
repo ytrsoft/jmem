@@ -1,4 +1,4 @@
-    package com.ytrsoft;
+    package com.ytrsoft.core;
 
     import java.util.Arrays;
 

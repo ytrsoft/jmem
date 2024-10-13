@@ -1,4 +1,4 @@
-package com.ytrsoft;
+package com.ytrsoft.core;
 
 public enum Protection {
     READ(0x01),
@@ -17,5 +17,15 @@ public enum Protection {
 
     public int getValue() {
         return value;
+    }
+
+    public static Protection valueOf(int value) {
+        Protection[] values = Protection.values();
+        for(Protection p: values) {
+            if (p.getValue() == value) {
+                return p;
+            }
+        }
+        return null;
     }
 }
