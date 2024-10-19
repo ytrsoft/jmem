@@ -171,11 +171,7 @@ public interface Libmem extends StdCallLibrary {
 
     boolean LM_FindSegmentEx(LmProcess process, long address, LmSegment.ByReference segmentOut);
 
-    long LM_ReadMemory(long source, Pointer dest, long size);
-
     long LM_ReadMemoryEx(LmProcess process, long source, Pointer dest, long size);
-
-    long LM_WriteMemory(long dest, Pointer source, long size);
 
     long LM_WriteMemoryEx(LmProcess process, long dest, Pointer source, long size);
 
@@ -225,11 +221,7 @@ public interface Libmem extends StdCallLibrary {
 
     void LM_FreeInstructions(Pointer instructions);
 
-    long LM_CodeLength(long machineCode, long minLength);
-
     long LM_CodeLengthEx(LmProcess process, long machineCode, long minLength);
-
-    long LM_HookCode(long from, long to, LongByReference trampolineOut);
 
     long LM_HookCodeEx(LmProcess process, long from, long to, LongByReference trampolineOut);
 

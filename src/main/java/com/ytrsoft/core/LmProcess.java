@@ -37,7 +37,9 @@
             Libmem.LmProcess p = new Libmem.LmProcess();
             p.pid = this.id;
             p.ppid = this.pid;
-            p.arch = this.arch.getValue();
+            if (this.arch != null) {
+                p.arch = this.arch.getValue();
+            }
             p.bits = this.bits;
             p.start_time = this.startTime;
             p.name = NativeString.toByteArray(this.name, Libmem.LM_PATH_MAX);

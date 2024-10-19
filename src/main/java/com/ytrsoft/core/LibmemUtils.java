@@ -277,19 +277,6 @@ public final class LibmemUtils {
     }
 
     /**
-     * 读取指定地址的内存
-     *
-     * @param address 内存地址
-     * @param size 要读取的字节数
-     * @return 读取的内存
-     */
-    public static Memory readMemory(long address, long size) {
-        Memory buffer = new Memory(size);
-        Libmem.INSTANCE.LM_ReadMemory(address, buffer, size);
-        return buffer;
-    }
-
-    /**
      * 从指定进程的内存中读取数据
      *
      * @param process 进程对象
@@ -301,17 +288,6 @@ public final class LibmemUtils {
         Memory buffer = new Memory(size);
         Libmem.INSTANCE.LM_ReadMemoryEx(process.toRef(), address, buffer, size);
         return buffer;
-    }
-
-    /**
-     * 向指定内存地址写入数据
-     *
-     * @param address 内存地址
-     * @param memory 要写入的内存
-     * @return 成功写入的字节数
-     */
-    public static long writeMemory(long address, Memory memory) {
-        return Libmem.INSTANCE.LM_WriteMemory(address, memory, memory.size());
     }
 
     /**
@@ -331,11 +307,15 @@ public final class LibmemUtils {
      * @param address 内存地址
      * @param size 要修改保护属性的内存大小
      * @param protection 新的保护属性
-     * @return 如果修改成功返回 true 否则返回 false
+     * @return 如果修改成功返回旧的权限
      */
-    public static boolean protectMemory(long address, long size, Protection protection) {
+    public static Protection protectMemory(long address, long size, Protection protection) {
         IntByReference oldProtection = new IntByReference();
-        return Libmem.INSTANCE.LM_ProtMemory(address, size, protection.getValue(), oldProtection);
+        boolean status = Libmem.INSTANCE.LM_ProtMemory(address, size, protection.getValue(), oldProtection);
+        if (status) {
+            return Protection.valueOf(oldProtection.getValue());
+        }
+        return Protection.UNKNOWN;
     }
 
     /**
@@ -345,11 +325,15 @@ public final class LibmemUtils {
      * @param address 内存地址
      * @param size 要修改保护属性的内存大小
      * @param protection 新的保护属性
-     * @return 如果修改成功返回 true 否则返回 false
+     * @return 如果修改成功返回旧的权限
      */
-    public static boolean protectMemory(LmProcess process, long address, long size, Protection protection) {
+    public static Protection protectMemory(LmProcess process, long address, long size, Protection protection) {
         IntByReference oldProtection = new IntByReference();
-        return Libmem.INSTANCE.LM_ProtMemoryEx(process.toRef(), address, size, protection.getValue(), oldProtection);
+        boolean status = Libmem.INSTANCE.LM_ProtMemoryEx(process.toRef(), address, size, protection.getValue(), oldProtection);
+        if (status) {
+            return Protection.valueOf(oldProtection.getValue());
+        }
+        return Protection.UNKNOWN;
     }
 
     /**
@@ -506,19 +490,6 @@ public final class LibmemUtils {
     }
 
     /**
-     * 安装代码钩子 在两个地址之间安装钩子
-     *
-     * @param from 源代码地址
-     * @param to 目标代码地址
-     * @param trampolineOut 保存跳板地址的引用
-     * @return 钩子安装后的跳板地址
-     */
-    public static long hookCode(long from, long to, LongByReference trampolineOut) {
-        return Libmem.INSTANCE.LM_HookCode(from, to, trampolineOut);
-    }
-
-
-    /**
      * 根据符号名称获取模块中的符号地址
      *
      * @param module 模块对象
@@ -585,17 +556,6 @@ public final class LibmemUtils {
      */
     public static boolean disassemble(long machineCode, Libmem.LmInst.ByReference instructionOut) {
         return Libmem.INSTANCE.LM_Disassemble(machineCode, instructionOut);
-    }
-
-    /**
-     * 获取指定机器代码的指令长度
-     *
-     * @param machineCode 机器代码地址
-     * @param minLength 最小指令长度
-     * @return 指令长度
-     */
-    public static long getCodeLength(long machineCode, long minLength) {
-        return Libmem.INSTANCE.LM_CodeLength(machineCode, minLength);
     }
 
     /**

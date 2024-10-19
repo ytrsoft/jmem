@@ -1,7 +1,7 @@
 package com.ytrsoft.core;
 
 public enum Protection {
-    NONE(-1),
+    UNKNOWN(-1),
 
     READ(0x01),
     WRITE(0x02),
@@ -28,6 +28,6 @@ public enum Protection {
                 return p;
             }
         }
-        return Protection.NONE;
+        return Protection.UNKNOWN;
     }
 }

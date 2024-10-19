@@ -168,29 +168,12 @@ public class LibmemTest {
     }
 
     @Test
-    @Deprecated
-    public void testReadMemoryV2() {
-        long hp = 0xD4800000;
-        Memory memory = LibmemUtils.readMemory(hp, 4);
-        System.out.println(memory.getInt(0));
-    }
-
-    @Test
         public void testWriteMemory() {
-        long hp = 0x0019EBF0;
+        long hp = 0x00428282;
         Memory memory = new Memory(4);
-        memory.setInt(0, 100);
+        memory.setInt(0, 10);
         long writeSize = LibmemUtils.writeMemory(MarioXP_0121, hp, memory);
         System.out.println(writeSize);
-    }
-
-    @Test
-    @Deprecated
-    public void testWriteMemoryV2() {
-        long hp = 0xD4800000;
-        Memory memory = new Memory(4);
-        long code = LibmemUtils.writeMemory(hp, memory);
-        System.out.println(code);
     }
 
     @Test
@@ -234,18 +217,16 @@ public class LibmemTest {
     @Test
     @Deprecated
     public void testProtectMemory() {
-        long address = 2147377152;
-        long size = 4096;
-        boolean result = LibmemUtils.protectMemory(address, size, Protection.READ_WRITE);
-        System.out.println(result);
+        long address = 140733513662464L;
+        Protection protection = LibmemUtils.protectMemory(address, 0, Protection.READ_WRITE);
+        System.out.println(protection);
     }
 
     @Test
     public void testProtectMemoryWithProcess() {
-        long address = 0x00400000;
-        long size = 4096;
-        boolean result = LibmemUtils.protectMemory(MarioXP_0121, address, size, Protection.READ_EXECUTE);
-        System.out.println(result);
+        long address = 0x0019CA98;
+        Protection protection = LibmemUtils.protectMemory(MarioXP_0121, address, 0, Protection.READ_EXECUTE);
+        System.out.println(protection);
     }
 
     @Test
@@ -264,38 +245,27 @@ public class LibmemTest {
 
     @Test
     public void testDeepPointerWithProcess() {
-        long baseAddress = 0x10270356;
-        long[] offsets = {0x0102};
-        long resolvedAddress = LibmemUtils.deepPointer(MarioXP_0121, baseAddress, offsets);
-        System.out.println(Long.toHexString(resolvedAddress));
+        long address = 0x000998D0;
+        long[] offsets = {0x00};
+        long result = LibmemUtils.deepPointer(MarioXP_0121, address, offsets);
+        System.out.println(result);
     }
 
     @Test
     @Deprecated
     public void testDeepPointerWithoutProcess() {
-        long baseAddress = 0x00400000;
-        long[] offsets = {0x10, 0x20, 0x30};
-        long resolvedAddress = LibmemUtils.deepPointer(baseAddress, offsets);
-        System.out.println(Long.toHexString(resolvedAddress));
+        long address = 140733513662464L;
+        long[] offsets = {0x00};
+        long result = LibmemUtils.deepPointer(address, offsets);
+        System.out.println(result);
     }
 
     @Test
     public void testGetCodeLengthEx() {
-        long machineCode = 0x00400000;
-        long minLength = 4;
+        long machineCode = 0x000998D0;
+        long minLength = 1;
         long codeLength = LibmemUtils.getCodeLength(MarioXP_0121, machineCode, minLength);
         System.out.println(codeLength);
-    }
-
-    @Test
-    @Deprecated
-    public void testHookCode() {
-        long fromAddress = 0x00400000;
-        long toAddress = 0x00401000;
-        LongByReference trampolineOut = new LongByReference();
-        long hookResult = LibmemUtils.hookCode(fromAddress, toAddress, trampolineOut);
-        System.out.println(hookResult);
-        System.out.println(Long.toHexString(trampolineOut.getValue()));
     }
 
     @Test
@@ -328,23 +298,28 @@ public class LibmemTest {
     }
 
     @Test
-    @Deprecated
     public void testDisassemble() {
-        long maxSize = 64;
-        long instructionCount = 10;
-        long runtimeAddress = 0x00400000;
-        long machineCodeAddress = 0x00400000;
-        long result = LibmemUtils.disassemble(machineCodeAddress, Arch.X86, maxSize, instructionCount, runtimeAddress);
-        System.out.println(result);
+        LmModule module = LibmemUtils.getModuleByPath(modulePath);
+        List<LmSymbol> symbols = LibmemUtils.getSymbolsDemangled(module);
+        if (!symbols.isEmpty()) {
+            long address = symbols.get(0).getAddress();
+            long result = LibmemUtils.disassemble(address, Arch.X64, 64, 0, address);
+            System.out.println(result);
+        }
     }
 
     @Test
     @Deprecated
-    public void testGetCodeLength() {
-        long minLength = 5;
-        long machineCodeAddress = 0x00400000;
-        long codeLength = LibmemUtils.getCodeLength(machineCodeAddress, minLength);
-        System.out.println(codeLength);
+    public void testDisassembleV2() {
+        LmModule module = LibmemUtils.getModuleByPath(modulePath);
+        List<LmSymbol> symbols = LibmemUtils.getSymbolsDemangled(module);
+        if (!symbols.isEmpty()) {
+            Libmem.LmInst.ByReference inst = new Libmem.LmInst.ByReference();
+            long address = symbols.get(0).getAddress();
+            boolean result = LibmemUtils.disassemble(address, inst);
+            System.out.println(result);
+            System.out.println(inst);
+        }
     }
 
     @Test
@@ -379,12 +354,5 @@ public class LibmemTest {
         boolean result = LibmemUtils.unhookCode(MarioXP_0121, machineCodeAddress, trampoline, size);
         System.out.println(result);
     }
-    @Test
-    public void testPatternScanWithProcess() {
-        byte[] pattern = new byte[]{(byte) 0x90, (byte) 0x90, (byte) 0x90, (byte) 0x90};
-        String mask = "xxxx";
-        long baseAddress = 10270458;
-        long result = LibmemUtils.patternScan(MarioXP_0121, pattern, mask, baseAddress, 4);
-        System.out.println(result);
-    }
+
 }
