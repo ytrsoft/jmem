@@ -1,10 +1,23 @@
 package com.ytrsoft.core;
 
+import com.ytrsoft.ui.table.Column;
+import com.ytrsoft.ui.table.Formatter;
+import com.ytrsoft.utils.HexTransform;
+import com.ytrsoft.utils.MemSizeTransform;
+
 public class LmModule {
+    @Column(value = "基址", center = true)
+    @Formatter(HexTransform.class)
     private long base;
+    @Formatter(HexTransform.class)
+    @Column(value = "地址", center = true)
     private long end;
+    @Column(value = "大小", center = true)
+    @Formatter(MemSizeTransform.class)
     private long size;
+    @Column(value = "路径", width = 200)
     private String path;
+    @Column(value = "名称", width = 200)
     private String name;
 
     public LmModule() {}

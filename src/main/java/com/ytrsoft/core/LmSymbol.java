@@ -1,7 +1,14 @@
 package com.ytrsoft.core;
 
+import com.ytrsoft.ui.table.Column;
+import com.ytrsoft.ui.table.Formatter;
+import com.ytrsoft.utils.HexTransform;
+
 public class LmSymbol {
+    @Column("名称")
     public String name;
+    @Formatter(HexTransform.class)
+    @Column(value = "地址", center = true)
     public long address;
 
     public LmSymbol() {}

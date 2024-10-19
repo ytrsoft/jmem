@@ -1,12 +1,24 @@
     package com.ytrsoft.core;
 
+    import com.ytrsoft.ui.table.Column;
+    import com.ytrsoft.ui.table.Formatter;
+    import com.ytrsoft.utils.TimeTransform;
+
     public class LmProcess {
+        @Column(value = "ID", center = true)
         private int id;
+        @Column(value = "PID", center = true)
         private int pid;
+        @Column(value = "架构", center = true)
         private Arch arch;
+        @Column(value = "位数", center = true)
         private long bits;
+        @Column(value = "启动时间", width = 120)
+        @Formatter(TimeTransform.class)
         private long startTime;
+        @Column(value = "路径", width = 200)
         private String path;
+        @Column(value = "名称", width = 200)
         private String name;
 
         public LmProcess() {}

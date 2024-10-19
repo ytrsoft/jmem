@@ -1,6 +1,8 @@
 package com.ytrsoft.core;
 
 public enum Protection {
+    NONE(-1),
+
     READ(0x01),
     WRITE(0x02),
     EXECUTE(0x04),
@@ -26,6 +28,6 @@ public enum Protection {
                 return p;
             }
         }
-        return null;
+        return Protection.NONE;
     }
 }

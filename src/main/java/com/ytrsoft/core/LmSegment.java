@@ -1,10 +1,22 @@
     package com.ytrsoft.core;
-    
+
+    import com.ytrsoft.ui.table.Column;
+    import com.ytrsoft.ui.table.Formatter;
+    import com.ytrsoft.utils.HexTransform;
+    import com.ytrsoft.utils.MemSizeTransform;
+
     public class LmSegment {
+        @Formatter(HexTransform.class)
+        @Column(value = "基址", center = true)
         private long base;
+        @Formatter(HexTransform.class)
+        @Column(value = "地址", center = true)
         private long end;
+        @Column(value = "大小", center = true)
+        @Formatter(MemSizeTransform.class)
         private long size;
-        private int prot;
+        @Column(value = "权限", center = true)
+        private Protection prot;
     
         public LmSegment() {}
     
@@ -12,7 +24,7 @@
             this.base = s.base;
             this.end = s.end;
             this.size = s.size;
-            this.prot = s.prot;
+            this.prot = Protection.valueOf(s.prot);
         }
     
         public Libmem.LmSegment toRef() {
@@ -20,7 +32,7 @@
             s.base = this.base;
             s.end = this.end;
             s.size = this.size;
-            s.prot = this.prot;
+            s.prot = this.prot.getValue();
             return s;
         }
     
@@ -48,11 +60,11 @@
             this.size = size;
         }
     
-        public int getProt() {
+        public Protection getProt() {
             return prot;
         }
     
-        public void setProt(int prot) {
+        public void setProt(Protection prot) {
             this.prot = prot;
         }
     

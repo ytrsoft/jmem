@@ -1,8 +1,12 @@
 package com.ytrsoft.core;
 
+import com.ytrsoft.ui.table.Column;
+
 public class LmThread {
 
+    @Column(value = "ID", center = true)
     private int id;
+    @Column(value = "PID", center = true)
     private int pid;
 
     public LmThread() {}
